@@ -1,0 +1,9 @@
+global:
+  scrape_interval: "5s"
+
+scrape_configs:
+  - job_name: 'custom_metrics_local'
+    scheme: 'http'
+    static_configs:
+      - targets: ['host.docker.internal:8080','host.docker.internal:8090','host.docker.internal:8091','host.docker.internal:8092','host.docker.internal:8093','host.docker.internal:8094','host.docker.internal:8095','host.docker.internal:8096']
+    metrics_path: '/private/metrics'
