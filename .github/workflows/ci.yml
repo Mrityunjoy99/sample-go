@@ -1,0 +1,31 @@
+name: CI Gating
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - 'master'
+permissions:
+  pull-requests: write
+  contents: write
+jobs:
+  ci-gating:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+      - name: Install Necessary Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+      - name: Run Tests
+        run: GIN_MODE=release CGO_ENABLED=1 go test -race -coverprofile="coverage.out"  "./src/..."
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: Mrityunjoy99/sample-go
+      
