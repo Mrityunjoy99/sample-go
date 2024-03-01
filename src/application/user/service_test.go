@@ -109,6 +109,38 @@ func (suite *UsersTestSuite) TestCreateUserFailure() {
 	assert.NotNil(suite.T(), err)
 }
 
+func (suite *UsersTestSuite) TestUpdateUserSuccess() {
+	userId := uuid.New()
+	expectedUser := entity.User{
+		BaseModel: database.BaseModel{
+			Id: userId,
+		},
+		FirstName: UserFirstName,
+		LastName:  UserLastName,
+		Email:     UserEmail,
+		Phone:     UserPhone,
+	}
+
+	updateUserDto := user.UpdateUserDto{
+		Id:        userId,
+		FirstName: UserFirstName,
+		LastName:  UserLastName,
+		Email:     UserEmail,
+		Phone:     UserPhone,
+	}
+
+	suite.userRepo.On("GetUserById", userId).Return(expectedUser, nil)
+	suite.userRepo.On("UpdateUser", expectedUser).Return(expectedUser, nil)
+	
+	actualUser, err := suite.service.UpdateUser(updateUserDto)
+
+	assert.Nil(suite.T(), err)
+	assert.Equal(suite.T(), expectedUser.FirstName, actualUser.FirstName)
+	assert.Equal(suite.T(), expectedUser.LastName, actualUser.LastName)
+	assert.Equal(suite.T(), expectedUser.Email, actualUser.Email)
+	assert.Equal(suite.T(), expectedUser.Phone, actualUser.Phone)
+}
+
 func TestUser(t *testing.T) {
 	suite.Run(t, new(UsersTestSuite))
 }
