@@ -1,6 +1,7 @@
 package user_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/Mrityunjoy99/sample-go/src/application/user"
@@ -23,7 +24,7 @@ func (suite *UsersTestSuite) SetupTest() {
 	suite.service = user.NewService(suite.userRepo)
 }
 
-func (suite *UsersTestSuite) TestGetUserById() {
+func (suite *UsersTestSuite) TestGetUserByIdSuccess() {
 	// Arrange
 
 	expectedUser := entity.User{
@@ -46,7 +47,15 @@ func (suite *UsersTestSuite) TestGetUserById() {
 	assert.Equal(suite.T(), expectedUser.Phone, actualUser.Phone)
 }
 
-func (suite *UsersTestSuite) TestCreateUser() {
+func (suite *UsersTestSuite) TestGetUserByIdFailure() {
+	userId:= uuid.New()
+	suite.userRepo.On("GetUserById", userId).Return(entity.User{}, errors.New("user not found"))
+	_, err := suite.service.GetUserById(userId)
+
+	assert.NotNil(suite.T(), err)
+}
+
+func (suite *UsersTestSuite) TestCreateUserSUccess() {
 	// Arrange
 	expectedUser := entity.User{
 		FirstName: "John",
@@ -70,6 +79,27 @@ func (suite *UsersTestSuite) TestCreateUser() {
 	assert.Equal(suite.T(), expectedUser.LastName, actualUser.LastName)
 	assert.Equal(suite.T(), expectedUser.Email, actualUser.Email)
 	assert.Equal(suite.T(), expectedUser.Phone, actualUser.Phone)
+}
+
+func (suite *UsersTestSuite) TestCreateUserFailure() {
+	expectedUser := entity.User{
+		FirstName: "John",
+		LastName:  "Doe",
+		Email:     "jhon.doe@gmail.com",
+		Phone:     "1234567890",
+	}
+
+	createUserDto := user.CreateUserDto{
+		FirstName: expectedUser.FirstName,
+		LastName:  expectedUser.LastName,
+		Email:     expectedUser.Email,
+		Phone:     expectedUser.Phone,
+	}
+
+	suite.userRepo.On("CreateUser", expectedUser).Return(entity.User{}, errors.New("failed to create user"))
+	_, err := suite.service.CreateUser(createUserDto)
+
+	assert.NotNil(suite.T(), err)
 }
 
 func TestUser(t *testing.T) {
