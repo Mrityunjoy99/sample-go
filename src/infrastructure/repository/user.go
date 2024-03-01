@@ -14,6 +14,7 @@ type userRepository struct {
 type UserRepository interface {
 	GetUserById(id uuid.UUID) (entity.User, error)
 	CreateUser(user entity.User) (entity.User, error)
+	UpdateUser(user entity.User) (entity.User, error)
 }
 
 func NewUserRepository(db *gorm.DB) UserRepository {
@@ -30,5 +31,10 @@ func (u *userRepository) GetUserById(id uuid.UUID) (entity.User, error) {
 
 func (u *userRepository) CreateUser(user entity.User) (entity.User, error) {
 	err := u.db.Create(&user).Error
+	return user, err
+}
+
+func (u *userRepository) UpdateUser(user entity.User) (entity.User, error) {
+	err := u.db.Save(&user).Error
 	return user, err
 }

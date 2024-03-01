@@ -13,6 +13,13 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+const (
+	UserFirstName = "John"
+	UserLastName  = "Doe"
+	UserEmail     = "jhon.doe@gmail.com"
+	UserPhone     = "1234567890"
+)
+
 type UsersTestSuite struct {
 	suite.Suite
 	service  user.Service
@@ -31,10 +38,10 @@ func (suite *UsersTestSuite) TestGetUserByIdSuccess() {
 		BaseModel: database.BaseModel{
 			Id: uuid.New(),
 		},
-		FirstName: "John",
-		LastName:  "Doe",
-		Email:     "jhon.doe@gmail.com",
-		Phone:     "1234567890",
+		FirstName: UserFirstName,
+		LastName:  UserLastName,
+		Email:     UserEmail,
+		Phone:     UserPhone,
 	}
 
 	suite.userRepo.On("GetUserById", expectedUser.Id).Return(expectedUser, nil)
@@ -48,7 +55,7 @@ func (suite *UsersTestSuite) TestGetUserByIdSuccess() {
 }
 
 func (suite *UsersTestSuite) TestGetUserByIdFailure() {
-	userId:= uuid.New()
+	userId := uuid.New()
 	suite.userRepo.On("GetUserById", userId).Return(entity.User{}, errors.New("user not found"))
 	_, err := suite.service.GetUserById(userId)
 
@@ -58,10 +65,10 @@ func (suite *UsersTestSuite) TestGetUserByIdFailure() {
 func (suite *UsersTestSuite) TestCreateUserSUccess() {
 	// Arrange
 	expectedUser := entity.User{
-		FirstName: "John",
-		LastName:  "Doe",
-		Email:     "jhon.doe@gmail.com",
-		Phone:     "1234567890",
+		FirstName: UserFirstName,
+		LastName:  UserLastName,
+		Email:     UserEmail,
+		Phone:     UserPhone,
 	}
 
 	createUserDto := user.CreateUserDto{
@@ -83,10 +90,10 @@ func (suite *UsersTestSuite) TestCreateUserSUccess() {
 
 func (suite *UsersTestSuite) TestCreateUserFailure() {
 	expectedUser := entity.User{
-		FirstName: "John",
-		LastName:  "Doe",
-		Email:     "jhon.doe@gmail.com",
-		Phone:     "1234567890",
+		FirstName: UserFirstName,
+		LastName:  UserLastName,
+		Email:     UserEmail,
+		Phone:     UserPhone,
 	}
 
 	createUserDto := user.CreateUserDto{

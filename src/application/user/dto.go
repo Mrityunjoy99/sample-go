@@ -21,6 +21,14 @@ func (dto CreateUserDto) toUserEntity() entity.User {
 	}
 }
 
+type UpdateUserDto struct {
+	Id        uuid.UUID `json:"-"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Email     string    `json:"email"`
+	Phone     string    `json:"phone"`
+}
+
 func newDtoFromEntity(user entity.User) UserResponseDto {
 	return UserResponseDto{
 		Id:        user.Id,

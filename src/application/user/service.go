@@ -12,6 +12,7 @@ type service struct {
 type Service interface {
 	GetUserById(id uuid.UUID) (UserResponseDto, error)
 	CreateUser(dto CreateUserDto) (UserResponseDto, error)
+	UpdateUser(dto UpdateUserDto) (UserResponseDto, error)
 }
 
 func NewService(userRepo repository.UserRepository) Service {
@@ -33,4 +34,22 @@ func (s *service) CreateUser(dto CreateUserDto) (UserResponseDto, error) {
 		return UserResponseDto{}, err
 	}
 	return newDtoFromEntity(user), nil
+}
+
+func (s *service) UpdateUser(dto UpdateUserDto) (UserResponseDto, error) {
+	currentUser, err := s.userRepo.GetUserById(dto.Id)
+	if err != nil {
+		return UserResponseDto{}, err
+	}
+
+	currentUser.FirstName = dto.FirstName
+	currentUser.LastName = dto.LastName
+	currentUser.Email = dto.Email
+	currentUser.Phone = dto.Phone
+
+	updatedUser, err := s.userRepo.UpdateUser(currentUser)
+	if err != nil {
+		return UserResponseDto{}, err
+	}
+	return newDtoFromEntity(updatedUser), nil
 }
