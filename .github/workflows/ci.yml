@@ -31,12 +31,11 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: Mrityunjoy99/sample-go
-      - name: Install goveralls
-        run: go install github.com/mattn/goveralls@latest
       - name: Send coverage
         env:
           COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-        uses: shogo82148/actions-goveralls@v1.9.0
+        uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./coverage.out
       
