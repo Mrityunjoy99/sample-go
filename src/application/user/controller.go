@@ -12,6 +12,7 @@ type controller struct {
 type Controller interface {
 	GetUserById(c *gin.Context)
 	CreateUser(c *gin.Context)
+	UpdateUser(c *gin.Context)
 }
 
 func NewController(service Service) Controller {
@@ -71,4 +72,45 @@ func (ctrl *controller) CreateUser(c *gin.Context) {
 	}
 
 	c.JSON(201, user)
+}
+
+func (ctrl *controller) UpdateUser(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "invalid id",
+		})
+
+		return
+	}
+
+	var dto UpdateUserDto
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		c.JSON(400, gin.H{
+			"error": "invalid request",
+		})
+
+		return
+	}
+
+	dto.Id = id
+	user, err := ctrl.service.UpdateUser(dto)
+	if err != nil {
+		if err.Error() == "record not found" {
+			c.JSON(404, gin.H{
+				"error": "user not found",
+			})
+
+			return
+		}
+
+		c.JSON(500, gin.H{
+			"error": "internal server error",
+		})
+
+		return
+	}
+
+	c.JSON(200, user)
 }

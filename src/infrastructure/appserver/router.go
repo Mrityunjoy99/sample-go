@@ -21,4 +21,5 @@ func registerUserRoutes(g *gin.Engine, s application.Service) {
 	userController := user.NewController(s.UserService)
 	g.GET("/user/:id", userController.GetUserById)
 	g.POST("/user", userController.CreateUser)
+	g.PUT("/user/:id", userController.UpdateUser)
 }
