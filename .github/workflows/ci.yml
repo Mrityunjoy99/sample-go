@@ -34,7 +34,7 @@ jobs:
       - name: Send coverage
         env:
           COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-        uses: coverallsapp/github-action@master
+        uses: shogo82148/actions-goveralls@v1.9.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       
