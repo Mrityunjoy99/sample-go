@@ -23,6 +23,8 @@ ignore:
   - "**/*controller.go"
   - "**/*_dto.go"
   - "src/mocks"
+  - "src/deployment"
+  - "src/repository"
   - "src/infrastructure"
   - "src/domain/entity"
   - "src/common/config"

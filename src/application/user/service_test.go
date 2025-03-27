@@ -25,8 +25,6 @@ func (suite *UsersTestSuite) SetupTest() {
 }
 
 func (suite *UsersTestSuite) TestGetUserByIdSuccess() {
-	// Arrange
-
 	expectedUser := entity.User{
 		BaseModel: database.BaseModel{
 			Id: uuid.New(),
@@ -48,15 +46,16 @@ func (suite *UsersTestSuite) TestGetUserByIdSuccess() {
 }
 
 func (suite *UsersTestSuite) TestGetUserByIdFailure() {
-	userId:= uuid.New()
+	userId := uuid.New()
+
 	suite.userRepo.On("GetUserById", userId).Return(entity.User{}, errors.New("user not found"))
+
 	_, err := suite.service.GetUserById(userId)
 
 	assert.NotNil(suite.T(), err)
 }
 
 func (suite *UsersTestSuite) TestCreateUserSUccess() {
-	// Arrange
 	expectedUser := entity.User{
 		FirstName: "John",
 		LastName:  "Doe",

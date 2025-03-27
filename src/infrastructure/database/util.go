@@ -69,7 +69,6 @@ func dialDb(c DBConfig) (*gorm.DB, error) {
 		dialector,
 		c.Options,
 	)
-
 	if err != nil {
 		return nil, errors.New("unable to connect to database")
 	}

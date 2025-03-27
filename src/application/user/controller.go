@@ -1,6 +1,8 @@
 package user
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -22,9 +24,10 @@ func NewController(service Service) Controller {
 
 func (ctrl *controller) GetUserById(c *gin.Context) {
 	idStr := c.Param("id")
+
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid id",
 		})
 
@@ -34,27 +37,27 @@ func (ctrl *controller) GetUserById(c *gin.Context) {
 	user, err := ctrl.service.GetUserById(id)
 	if err != nil {
 		if err.Error() == "record not found" {
-			c.JSON(404, gin.H{
+			c.JSON(http.StatusNotFound, gin.H{
 				"error": "user not found",
 			})
 
 			return
 		}
 
-		c.JSON(500, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "internal server error",
 		})
 
 		return
 	}
 
-	c.JSON(200, user)
+	c.JSON(http.StatusOK, user)
 }
 
 func (ctrl *controller) CreateUser(c *gin.Context) {
 	var dto CreateUserDto
 	if err := c.ShouldBindJSON(&dto); err != nil {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid request",
 		})
 
@@ -63,12 +66,12 @@ func (ctrl *controller) CreateUser(c *gin.Context) {
 
 	user, err := ctrl.service.CreateUser(dto)
 	if err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "internal server error",
 		})
 
 		return
 	}
 
-	c.JSON(201, user)
+	c.JSON(http.StatusCreated, user)
 }

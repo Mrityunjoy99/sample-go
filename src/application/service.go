@@ -11,7 +11,7 @@ type Service struct {
 
 func NewService(r repository.Repository) *Service {
 	userService := user.NewService(r.UserRepo)
-	
+
 	return &Service{
 		UserService: userService,
 	}

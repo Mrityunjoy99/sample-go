@@ -1,9 +1,8 @@
 package database
 
 import (
-	"fmt"
-
 	"errors"
+	"fmt"
 
 	"github.com/Mrityunjoy99/sample-go/src/common/config"
 	"gorm.io/gorm"

@@ -9,7 +9,6 @@ import (
 	"github.com/go-gormigrate/gormigrate/v2"
 )
 
-// nolint
 func GetMigrations() []*gormigrate.Migration {
 	migrations := []*gormigrate.Migration{
 		V20240229232650,
