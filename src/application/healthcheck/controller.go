@@ -1,6 +1,10 @@
 package healthcheck
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 type controller struct{}
 
@@ -13,7 +17,7 @@ func NewController() Controller {
 }
 
 func (c *controller) HealthCheck(ctx *gin.Context) {
-	ctx.JSON(200, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"message": "success",
 	})
 }

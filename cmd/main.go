@@ -6,7 +6,7 @@ import (
 
 	"github.com/Mrityunjoy99/sample-go/cmd/cmdopts"
 	"github.com/Mrityunjoy99/sample-go/migration"
-	"github.com/Mrityunjoy99/sample-go/src/infrastructure/appserver"
+	"github.com/Mrityunjoy99/sample-go/src/deployment/appserver"
 )
 
 func main() {

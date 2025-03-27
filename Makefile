@@ -33,9 +33,6 @@ test-run:
 test-cover:
 	GIN_MODE=release CGO_ENABLED=1 go test -race -coverprofile=$(COVER) $(VERB) $(MOD)
 
-test-run-cover: test-cover
-	scoverage -package=github.com/Buddy-Git/comms-svc -minCov=85
-
 html-coverage-report: test-cover
 	go tool cover -html=$(COVER) -o coverage.html
 

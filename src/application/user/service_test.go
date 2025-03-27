@@ -7,7 +7,7 @@ import (
 	"github.com/Mrityunjoy99/sample-go/src/application/user"
 	"github.com/Mrityunjoy99/sample-go/src/domain/entity"
 	"github.com/Mrityunjoy99/sample-go/src/infrastructure/database"
-	mock_repository "github.com/Mrityunjoy99/sample-go/src/mocks/infrastructure/repository"
+	mock_repository "github.com/Mrityunjoy99/sample-go/src/mocks/repository"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -25,8 +25,6 @@ func (suite *UsersTestSuite) SetupTest() {
 }
 
 func (suite *UsersTestSuite) TestGetUserByIdSuccess() {
-	// Arrange
-
 	expectedUser := entity.User{
 		BaseModel: database.BaseModel{
 			Id: uuid.New(),
@@ -48,15 +46,16 @@ func (suite *UsersTestSuite) TestGetUserByIdSuccess() {
 }
 
 func (suite *UsersTestSuite) TestGetUserByIdFailure() {
-	userId:= uuid.New()
+	userId := uuid.New()
+
 	suite.userRepo.On("GetUserById", userId).Return(entity.User{}, errors.New("user not found"))
+
 	_, err := suite.service.GetUserById(userId)
 
 	assert.NotNil(suite.T(), err)
 }
 
 func (suite *UsersTestSuite) TestCreateUserSUccess() {
-	// Arrange
 	expectedUser := entity.User{
 		FirstName: "John",
 		LastName:  "Doe",

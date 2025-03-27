@@ -8,6 +8,7 @@ type Repository struct {
 
 func NewRepository(db *gorm.DB) *Repository {
 	userRepo := NewUserRepository(db)
+
 	return &Repository{
 		UserRepo: userRepo,
 	}

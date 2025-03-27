@@ -10,7 +10,7 @@ type userRepository struct {
 	db *gorm.DB
 }
 
-//go:generate mockery --name=UserRepository --output=./../../mocks/infrastructure/repository --outpkg=mock_repository
+//go:generate mockery --name=UserRepository --output=./../mocks/repository --outpkg=mock_repository
 type UserRepository interface {
 	GetUserById(id uuid.UUID) (entity.User, error)
 	CreateUser(user entity.User) (entity.User, error)

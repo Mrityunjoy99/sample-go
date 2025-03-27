@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/Mrityunjoy99/sample-go/src/infrastructure/repository"
+	"github.com/Mrityunjoy99/sample-go/src/repository"
 	"github.com/google/uuid"
 )
 
@@ -23,14 +23,17 @@ func (s *service) GetUserById(id uuid.UUID) (UserResponseDto, error) {
 	if err != nil {
 		return UserResponseDto{}, err
 	}
+
 	return newDtoFromEntity(user), nil
 }
 
 func (s *service) CreateUser(dto CreateUserDto) (UserResponseDto, error) {
 	user := dto.toUserEntity()
+
 	user, err := s.userRepo.CreateUser(user)
 	if err != nil {
 		return UserResponseDto{}, err
 	}
+
 	return newDtoFromEntity(user), nil
 }

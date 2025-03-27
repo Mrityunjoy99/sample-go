@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/Mrityunjoy99/sample-go/src/application/user"
-	"github.com/Mrityunjoy99/sample-go/src/infrastructure/repository"
+	"github.com/Mrityunjoy99/sample-go/src/repository"
 )
 
 type Service struct {
@@ -11,7 +11,7 @@ type Service struct {
 
 func NewService(r repository.Repository) *Service {
 	userService := user.NewService(r.UserRepo)
-	
+
 	return &Service{
 		UserService: userService,
 	}
