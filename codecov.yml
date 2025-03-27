@@ -14,7 +14,6 @@ coverage:
       flag_coverage_not_uploaded_behavior: include
     patch: true
     project: true
-    range: 90
 github_checks:
   annotations: true
 ignore:
