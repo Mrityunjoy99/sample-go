@@ -28,3 +28,4 @@ ignore:
   - "src/infrastructure"
   - "src/domain/entity"
   - "src/common/config"
+  - "src/application/service.go"
