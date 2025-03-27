@@ -98,6 +98,7 @@ func (ctrl *controller) UpdateUser(c *gin.Context) {
 
 		return
 	}
+
 	user, gerr := ctrl.service.UpdateUser(id, dto)
 	if gerr != nil {
 		if gerr.GetCode() == constant.ErrorCodeResourceNotFound {

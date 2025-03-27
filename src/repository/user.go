@@ -43,6 +43,7 @@ func (u *userRepository) CreateUser(user entity.User) (*entity.User, genericerro
 	if err != nil {
 		return nil, genericerror.NewInternalErrByErr(err)
 	}
+
 	return &user, nil
 }
 
