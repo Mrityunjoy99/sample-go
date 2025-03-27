@@ -4,6 +4,8 @@ package mock_repository
 
 import (
 	entity "github.com/Mrityunjoy99/sample-go/src/domain/entity"
+	genericerror "github.com/Mrityunjoy99/sample-go/src/tools/genericerror"
+
 	mock "github.com/stretchr/testify/mock"
 
 	uuid "github.com/google/uuid"
@@ -15,56 +17,96 @@ type UserRepository struct {
 }
 
 // CreateUser provides a mock function with given fields: user
-func (_m *UserRepository) CreateUser(user entity.User) (entity.User, error) {
+func (_m *UserRepository) CreateUser(user entity.User) (*entity.User, genericerror.GenericError) {
 	ret := _m.Called(user)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateUser")
 	}
 
-	var r0 entity.User
-	var r1 error
-	if rf, ok := ret.Get(0).(func(entity.User) (entity.User, error)); ok {
+	var r0 *entity.User
+	var r1 genericerror.GenericError
+	if rf, ok := ret.Get(0).(func(entity.User) (*entity.User, genericerror.GenericError)); ok {
 		return rf(user)
 	}
-	if rf, ok := ret.Get(0).(func(entity.User) entity.User); ok {
+	if rf, ok := ret.Get(0).(func(entity.User) *entity.User); ok {
 		r0 = rf(user)
 	} else {
-		r0 = ret.Get(0).(entity.User)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entity.User)
+		}
 	}
 
-	if rf, ok := ret.Get(1).(func(entity.User) error); ok {
+	if rf, ok := ret.Get(1).(func(entity.User) genericerror.GenericError); ok {
 		r1 = rf(user)
 	} else {
-		r1 = ret.Error(1)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(genericerror.GenericError)
+		}
 	}
 
 	return r0, r1
 }
 
 // GetUserById provides a mock function with given fields: id
-func (_m *UserRepository) GetUserById(id uuid.UUID) (entity.User, error) {
+func (_m *UserRepository) GetUserById(id uuid.UUID) (*entity.User, genericerror.GenericError) {
 	ret := _m.Called(id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserById")
 	}
 
-	var r0 entity.User
-	var r1 error
-	if rf, ok := ret.Get(0).(func(uuid.UUID) (entity.User, error)); ok {
+	var r0 *entity.User
+	var r1 genericerror.GenericError
+	if rf, ok := ret.Get(0).(func(uuid.UUID) (*entity.User, genericerror.GenericError)); ok {
 		return rf(id)
 	}
-	if rf, ok := ret.Get(0).(func(uuid.UUID) entity.User); ok {
+	if rf, ok := ret.Get(0).(func(uuid.UUID) *entity.User); ok {
 		r0 = rf(id)
 	} else {
-		r0 = ret.Get(0).(entity.User)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entity.User)
+		}
 	}
 
-	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+	if rf, ok := ret.Get(1).(func(uuid.UUID) genericerror.GenericError); ok {
 		r1 = rf(id)
 	} else {
-		r1 = ret.Error(1)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(genericerror.GenericError)
+		}
+	}
+
+	return r0, r1
+}
+
+// UpdateUser provides a mock function with given fields: user
+func (_m *UserRepository) UpdateUser(user entity.User) (*entity.User, genericerror.GenericError) {
+	ret := _m.Called(user)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateUser")
+	}
+
+	var r0 *entity.User
+	var r1 genericerror.GenericError
+	if rf, ok := ret.Get(0).(func(entity.User) (*entity.User, genericerror.GenericError)); ok {
+		return rf(user)
+	}
+	if rf, ok := ret.Get(0).(func(entity.User) *entity.User); ok {
+		r0 = rf(user)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entity.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(entity.User) genericerror.GenericError); ok {
+		r1 = rf(user)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(genericerror.GenericError)
+		}
 	}
 
 	return r0, r1

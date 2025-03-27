@@ -21,13 +21,19 @@ func (dto CreateUserDto) toUserEntity() entity.User {
 	}
 }
 
-func newDtoFromEntity(user entity.User) UserResponseDto {
-	return UserResponseDto{
-		Id:        user.Id,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Email:     user.Email,
-		Phone:     user.Phone,
+type UpdateUserDto struct {
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+}
+
+func (dto UpdateUserDto) toUserEntity() entity.User {
+	return entity.User{
+		FirstName: dto.FirstName,
+		LastName:  dto.LastName,
+		Email:     dto.Email,
+		Phone:     dto.Phone,
 	}
 }
 
@@ -37,4 +43,14 @@ type UserResponseDto struct {
 	LastName  string    `json:"last_name"`
 	Email     string    `json:"email"`
 	Phone     string    `json:"phone"`
+}
+
+func newDtoFromEntity(user entity.User) UserResponseDto {
+	return UserResponseDto{
+		Id:        user.Id,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Email:     user.Email,
+		Phone:     user.Phone,
+	}
 }
