@@ -1,6 +1,6 @@
 module github.com/Mrityunjoy99/sample-go
 
-go 1.21.0
+go 1.23
 
 require (
 	github.com/creasty/defaults v1.7.0

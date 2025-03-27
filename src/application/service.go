@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/Mrityunjoy99/sample-go/src/application/user"
-	"github.com/Mrityunjoy99/sample-go/src/infrastructure/repository"
+	"github.com/Mrityunjoy99/sample-go/src/repository"
 )
 
 type Service struct {

@@ -4,7 +4,7 @@ import (
 	"github.com/Mrityunjoy99/sample-go/src/application"
 	"github.com/Mrityunjoy99/sample-go/src/common/config"
 	"github.com/Mrityunjoy99/sample-go/src/infrastructure/database"
-	"github.com/Mrityunjoy99/sample-go/src/infrastructure/repository"
+	"github.com/Mrityunjoy99/sample-go/src/repository"
 	"github.com/gin-gonic/gin"
 )
 

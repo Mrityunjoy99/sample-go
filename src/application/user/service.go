@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/Mrityunjoy99/sample-go/src/infrastructure/repository"
+	"github.com/Mrityunjoy99/sample-go/src/repository"
 	"github.com/google/uuid"
 )
 

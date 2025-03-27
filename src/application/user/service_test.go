@@ -7,7 +7,7 @@ import (
 	"github.com/Mrityunjoy99/sample-go/src/application/user"
 	"github.com/Mrityunjoy99/sample-go/src/domain/entity"
 	"github.com/Mrityunjoy99/sample-go/src/infrastructure/database"
-	mock_repository "github.com/Mrityunjoy99/sample-go/src/mocks/infrastructure/repository"
+	mock_repository "github.com/Mrityunjoy99/sample-go/src/mocks/repository"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
