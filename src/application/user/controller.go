@@ -16,6 +16,7 @@ type Controller interface {
 	GetUserById(c *gin.Context)
 	CreateUser(c *gin.Context)
 	UpdateUser(c *gin.Context)
+	DeleteUser(c *gin.Context)
 }
 
 func NewController(service Service) Controller {
@@ -101,7 +102,7 @@ func (ctrl *controller) UpdateUser(c *gin.Context) {
 
 	user, gerr := ctrl.service.UpdateUser(id, dto)
 	if gerr != nil {
-		if gerr.GetCode() == constant.ErrorCodeResourceNotFound {
+		if gerr.GetCode() == constant.ErrorCodeBadRequest {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "user not found",
 			})
@@ -117,4 +118,39 @@ func (ctrl *controller) UpdateUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func (ctrl *controller) DeleteUser(c *gin.Context) {
+	idStr := c.Param("id")
+
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid id",
+		})
+
+		return
+	}
+
+	gerr := ctrl.service.DeleteUser(id)
+	if gerr != nil {
+		switch gerr.GetCode() {
+		case constant.ErrorCodeBadRequest:
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": gerr.Error(),
+			})
+
+			return
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": gerr.Error(),
+			})
+
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User is successfully deleted",
+	})
 }

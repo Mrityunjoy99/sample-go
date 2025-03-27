@@ -12,7 +12,7 @@
       "program": "${workspaceFolder}/cmd/main.go",
       "cwd": "${workspaceFolder}",
       "envFile": "${workspaceFolder}/.env",
-      "args": []
+      "args": ["run"]
     }
   ]
 }
