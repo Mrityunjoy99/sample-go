@@ -31,8 +31,6 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: Mrityunjoy99/sample-go
-          files: ./coverage.out
-          flags: unittests
           fail_ci_if_error: true
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
@@ -40,8 +38,6 @@ jobs:
         with:
             token: ${{ secrets.CODECOV_TOKEN }}
             slug: Mrityunjoy99/sample-go
-            files: ./coverage.out
-            flags: unittests
             fail_ci_if_error: true
 
       
