@@ -29,3 +29,4 @@ ignore:
   - "src/domain/entity"
   - "src/common/config"
   - "src/application/service.go"
+  - "src/tools"

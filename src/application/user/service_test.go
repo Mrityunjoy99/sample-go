@@ -5,9 +5,11 @@ import (
 	"testing"
 
 	"github.com/Mrityunjoy99/sample-go/src/application/user"
+	"github.com/Mrityunjoy99/sample-go/src/common/constant"
 	"github.com/Mrityunjoy99/sample-go/src/domain/entity"
 	"github.com/Mrityunjoy99/sample-go/src/infrastructure/database"
 	mock_repository "github.com/Mrityunjoy99/sample-go/src/mocks/repository"
+	"github.com/Mrityunjoy99/sample-go/src/tools/genericerror"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -35,7 +37,7 @@ func (suite *UsersTestSuite) TestGetUserByIdSuccess() {
 		Phone:     "1234567890",
 	}
 
-	suite.userRepo.On("GetUserById", expectedUser.Id).Return(expectedUser, nil)
+	suite.userRepo.On("GetUserById", expectedUser.Id).Return(&expectedUser, nil)
 	actualUser, err := suite.service.GetUserById(expectedUser.Id)
 
 	assert.Nil(suite.T(), err)
@@ -48,14 +50,15 @@ func (suite *UsersTestSuite) TestGetUserByIdSuccess() {
 func (suite *UsersTestSuite) TestGetUserByIdFailure() {
 	userId := uuid.New()
 
-	suite.userRepo.On("GetUserById", userId).Return(entity.User{}, errors.New("user not found"))
+	suite.userRepo.On("GetUserById", userId).
+		Return(nil, genericerror.NewGenericError(constant.ErrorCodeBadRequest, "bad request", nil, nil))
 
 	_, err := suite.service.GetUserById(userId)
 
 	assert.NotNil(suite.T(), err)
 }
 
-func (suite *UsersTestSuite) TestCreateUserSUccess() {
+func (suite *UsersTestSuite) TestCreateUserSuccess() {
 	expectedUser := entity.User{
 		FirstName: "John",
 		LastName:  "Doe",
@@ -70,7 +73,7 @@ func (suite *UsersTestSuite) TestCreateUserSUccess() {
 		Phone:     expectedUser.Phone,
 	}
 
-	suite.userRepo.On("CreateUser", expectedUser).Return(expectedUser, nil)
+	suite.userRepo.On("CreateUser", expectedUser).Return(&expectedUser, nil)
 	actualUser, err := suite.service.CreateUser(createUserDto)
 
 	assert.Nil(suite.T(), err)
@@ -95,10 +98,93 @@ func (suite *UsersTestSuite) TestCreateUserFailure() {
 		Phone:     expectedUser.Phone,
 	}
 
-	suite.userRepo.On("CreateUser", expectedUser).Return(entity.User{}, errors.New("failed to create user"))
+	suite.userRepo.On("CreateUser", expectedUser).
+		Return(nil, genericerror.NewInternalErrByErr(errors.New("failed to create user")))
+
 	_, err := suite.service.CreateUser(createUserDto)
 
 	assert.NotNil(suite.T(), err)
+}
+
+func (suite *UsersTestSuite) TestUpdateUserSuccess() {
+	expectedUser := entity.User{
+		BaseModel: database.BaseModel{
+			Id: uuid.New(),
+		},
+		FirstName: "John",
+		LastName:  "Doe",
+		Email:     "jhon.doe@gmail.com",
+		Phone:     "1234567890",
+	}
+
+	updateUserDto := user.UpdateUserDto{
+		FirstName: expectedUser.FirstName,
+		LastName:  expectedUser.LastName,
+		Email:     expectedUser.Email,
+		Phone:     expectedUser.Phone,
+	}
+
+	suite.userRepo.On("UpdateUser", expectedUser).Return(&expectedUser, nil)
+	actualUser, err := suite.service.UpdateUser(expectedUser.Id, updateUserDto)
+
+	assert.Nil(suite.T(), err)
+	assert.Equal(suite.T(), expectedUser.FirstName, actualUser.FirstName)
+}
+
+func (suite *UsersTestSuite) TestUpdateUserFailureUserNotFound() {
+	expectedUser := entity.User{
+		BaseModel: database.BaseModel{
+			Id: uuid.New(),
+		},
+		FirstName: "John",
+		LastName:  "Doe",
+		Email:     "jhon.doe@gmail.com",
+		Phone:     "1234567890",
+	}
+
+	updateUserDto := user.UpdateUserDto{
+		FirstName: expectedUser.FirstName,
+		LastName:  expectedUser.LastName,
+		Email:     expectedUser.Email,
+		Phone:     expectedUser.Phone,
+	}
+
+	suite.userRepo.On("UpdateUser", expectedUser).
+		Return(nil, genericerror.NewGenericError(constant.ErrorCodeResourceNotFound, "user not found", nil, nil))
+
+	actualUser, err := suite.service.UpdateUser(expectedUser.Id, updateUserDto)
+
+	assert.Equal(suite.T(), actualUser.FirstName, "")
+	assert.NotNil(suite.T(), err)
+	assert.Equal(suite.T(), err.GetCode(), constant.ErrorCodeResourceNotFound)
+}
+
+func (suite *UsersTestSuite) TestUpdateUserFailureGeneral() {
+	expectedUser := entity.User{
+		BaseModel: database.BaseModel{
+			Id: uuid.New(),
+		},
+		FirstName: "John",
+		LastName:  "Doe",
+		Email:     "jhon.doe@gmail.com",
+		Phone:     "1234567890",
+	}
+
+	updateUserDto := user.UpdateUserDto{
+		FirstName: expectedUser.FirstName,
+		LastName:  expectedUser.LastName,
+		Email:     expectedUser.Email,
+		Phone:     expectedUser.Phone,
+	}
+
+	suite.userRepo.On("UpdateUser", expectedUser).
+		Return(nil, genericerror.NewGenericError(constant.ErrorCodeInternalServerError, "network failure", nil, nil))
+
+	actualUser, err := suite.service.UpdateUser(expectedUser.Id, updateUserDto)
+
+	assert.Equal(suite.T(), actualUser.FirstName, "")
+	assert.NotNil(suite.T(), err)
+	assert.Equal(suite.T(), err.GetCode(), constant.ErrorCodeInternalServerError)
 }
 
 func TestUser(t *testing.T) {
