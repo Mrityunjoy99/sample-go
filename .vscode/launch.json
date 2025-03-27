@@ -13,6 +13,6 @@
       "cwd": "${workspaceFolder}",
       "envFile": "${workspaceFolder}/.env",
       "args": []
-  }
+    }
   ]
 }

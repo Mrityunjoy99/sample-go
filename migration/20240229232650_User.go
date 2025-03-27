@@ -8,10 +8,10 @@ import (
 
 type V20240229232650User struct {
 	database.BaseModel
-	FirstName string
-	LastName  string
-	Email     string
-	Phone     string
+	FirstName string `gorm:"column:first_name;not null"`
+	LastName  string `gorm:"column:last_name;not null"`
+	Email     string `gorm:"column:email;not null"`
+	Phone     string `gorm:"column:phone;not null"`
 }
 
 func (V20240229232650User) TableName() string {
