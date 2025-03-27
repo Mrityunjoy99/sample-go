@@ -22,4 +22,5 @@ func registerUserRoutes(g *gin.Engine, s application.Service) {
 	g.GET("/user/:id", userController.GetUserById)
 	g.POST("/user", userController.CreateUser)
 	g.PUT("/user/:id", userController.UpdateUser)
+	g.DELETE("/user/:id", userController.DeleteUser)
 }

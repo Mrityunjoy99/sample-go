@@ -187,6 +187,40 @@ func (suite *UsersTestSuite) TestUpdateUserFailureGeneral() {
 	assert.Equal(suite.T(), err.GetCode(), constant.ErrorCodeInternalServerError)
 }
 
+func (suite *UsersTestSuite) TestDeleteUserSuccess() {
+	userId := uuid.New()
+
+	suite.userRepo.On("DeleteUser", userId).Return(nil)
+
+	err := suite.service.DeleteUser(userId)
+
+	assert.Nil(suite.T(), err)
+}
+
+func (suite *UsersTestSuite) TestDeleteUserFailureNotFound() {
+	userId := uuid.New()
+
+	suite.userRepo.On("DeleteUser", userId).
+		Return(genericerror.NewGenericError(constant.ErrorCodeBadRequest, "user not found", nil, nil))
+
+	err := suite.service.DeleteUser(userId)
+
+	assert.NotNil(suite.T(), err)
+	assert.Equal(suite.T(), err.GetCode(), constant.ErrorCodeBadRequest)
+}
+
+func (suite *UsersTestSuite) TestDeleteUserFailureGeneral() {
+	userId := uuid.New()
+
+	suite.userRepo.On("DeleteUser", userId).
+		Return(genericerror.NewGenericError(constant.ErrorCodeInternalServerError, "network failure", nil, nil))
+
+	err := suite.service.DeleteUser(userId)
+
+	assert.NotNil(suite.T(), err)
+	assert.Equal(suite.T(), err.GetCode(), constant.ErrorCodeInternalServerError)
+}
+
 func TestUser(t *testing.T) {
 	suite.Run(t, new(UsersTestSuite))
 }

@@ -14,6 +14,7 @@ type Service interface {
 	GetUserById(id uuid.UUID) (UserResponseDto, genericerror.GenericError)
 	CreateUser(dto CreateUserDto) (UserResponseDto, genericerror.GenericError)
 	UpdateUser(id uuid.UUID, dto UpdateUserDto) (UserResponseDto, genericerror.GenericError)
+	DeleteUser(id uuid.UUID) genericerror.GenericError
 }
 
 func NewService(userRepo repository.UserRepository) Service {
@@ -50,4 +51,8 @@ func (s *service) UpdateUser(id uuid.UUID, dto UpdateUserDto) (UserResponseDto, 
 	}
 
 	return newDtoFromEntity(*updatedUser), nil
+}
+
+func (s *service) DeleteUser(id uuid.UUID) genericerror.GenericError {
+	return s.userRepo.DeleteUser(id)
 }

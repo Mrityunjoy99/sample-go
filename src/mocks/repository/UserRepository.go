@@ -48,6 +48,26 @@ func (_m *UserRepository) CreateUser(user entity.User) (*entity.User, genericerr
 	return r0, r1
 }
 
+// DeleteUser provides a mock function with given fields: id
+func (_m *UserRepository) DeleteUser(id uuid.UUID) genericerror.GenericError {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteUser")
+	}
+
+	var r0 genericerror.GenericError
+	if rf, ok := ret.Get(0).(func(uuid.UUID) genericerror.GenericError); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(genericerror.GenericError)
+		}
+	}
+
+	return r0
+}
+
 // GetUserById provides a mock function with given fields: id
 func (_m *UserRepository) GetUserById(id uuid.UUID) (*entity.User, genericerror.GenericError) {
 	ret := _m.Called(id)
