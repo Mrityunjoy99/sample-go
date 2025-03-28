@@ -12,6 +12,7 @@ import (
 func GetMigrations() []*gormigrate.Migration {
 	migrations := []*gormigrate.Migration{
 		V20240229232650,
+		V20250328100858,
 	}
 
 	return migrations
