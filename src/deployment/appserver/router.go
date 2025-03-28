@@ -3,6 +3,7 @@ package appserver
 import (
 	"github.com/Mrityunjoy99/sample-go/src/application"
 	"github.com/Mrityunjoy99/sample-go/src/application/healthcheck"
+	"github.com/Mrityunjoy99/sample-go/src/application/url"
 	"github.com/Mrityunjoy99/sample-go/src/application/user"
 	"github.com/gin-gonic/gin"
 )
@@ -10,6 +11,7 @@ import (
 func RegisterRoutes(g *gin.Engine, s application.Service) {
 	registerHealthCheckRoutes(g)
 	registerUserRoutes(g, s)
+	registerUrlRoutes(g, s)
 }
 
 func registerHealthCheckRoutes(g *gin.Engine) {
@@ -23,4 +25,11 @@ func registerUserRoutes(g *gin.Engine, s application.Service) {
 	g.POST("/user", userController.CreateUser)
 	g.PUT("/user/:id", userController.UpdateUser)
 	g.DELETE("/user/:id", userController.DeleteUser)
+}
+
+func registerUrlRoutes(g *gin.Engine, s application.Service) {
+	urlController := url.NewController(s.UrlService)
+
+	g.POST("/url/register", urlController.RegisterUrl)
+	g.GET("/url/redirect/:url", urlController.Redirect)
 }
