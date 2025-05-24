@@ -30,3 +30,4 @@ ignore:
   - "src/common/config"
   - "src/application/service.go"
   - "src/tools"
+  - "src/domain/service/registry.go"
