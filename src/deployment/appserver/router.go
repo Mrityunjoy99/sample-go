@@ -2,6 +2,7 @@ package appserver
 
 import (
 	"github.com/Mrityunjoy99/sample-go/src/application"
+	"github.com/Mrityunjoy99/sample-go/src/application/admin"
 	"github.com/Mrityunjoy99/sample-go/src/application/healthcheck"
 	"github.com/Mrityunjoy99/sample-go/src/application/user"
 	"github.com/gin-gonic/gin"
@@ -10,6 +11,15 @@ import (
 func RegisterRoutes(g *gin.Engine, s application.Service) {
 	registerHealthCheckRoutes(g)
 	registerUserRoutes(g, s)
+	adminRouteGroup(g, s)
+}
+
+func adminRouteGroup(g *gin.Engine, s application.Service) {
+	adminGroup := g.Group("/admin")
+	// admin.Use(middleware.AdminAuth())
+	adminController := admin.NewController(s.AdminService)
+	adminGroup.POST("/generate-token", adminController.GenerateToken)
+	adminGroup.POST("/validate-token", adminController.ValidateToken)
 }
 
 func registerHealthCheckRoutes(g *gin.Engine) {
