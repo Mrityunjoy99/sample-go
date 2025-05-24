@@ -61,7 +61,11 @@ func (s *service) getShortenedUrl(originalUrl string) (string, genericerror.Gene
 		return "", genericerror.NewInternalErrByErr(err)
 	}
 
-	return Host + "/" + hex.EncodeToString(hasher.Sum(nil)), nil
+	hash := hex.EncodeToString(hasher.Sum(nil))
+	// Take first 6 characters of hash
+	shortHash := hash[:6]
+
+	return Host + "/" + shortHash, nil
 }
 
 func (s *service) Redirect(shortUrl string) (string, genericerror.GenericError) {

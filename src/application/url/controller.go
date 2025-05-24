@@ -64,5 +64,5 @@ func (ctrl *controller) Redirect(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusPermanentRedirect, originalUrl)
+	c.Redirect(http.StatusPermanentRedirect, originalUrl)
 }
