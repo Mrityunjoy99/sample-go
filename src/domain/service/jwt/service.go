@@ -36,7 +36,10 @@ func (s *jwtService) ValidateToken(token string) (*entity.JwtToken, error) {
 		return nil, err
 	}
 
-	// Safely extract claims
+	return s.validateTokenFromParsedToken(claims)
+}
+
+func (s *jwtService) validateTokenFromParsedToken(claims *jwt.Token) (*entity.JwtToken, error) {
 	mapClaims, ok := claims.Claims.(jwt.MapClaims)
 	if !ok {
 		return nil, fmt.Errorf("invalid token claims")

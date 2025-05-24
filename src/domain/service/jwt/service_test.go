@@ -4,8 +4,26 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 )
+
+// DummyClaims implements jwt.Claims but is not jwt.MapClaims
+type DummyClaims struct{}
+
+func (DummyClaims) Valid() error { return nil }
+
+func (DummyClaims) GetExpirationTime() (*jwt.NumericDate, error) { return nil, nil }
+
+func (DummyClaims) GetIssuedAt() (*jwt.NumericDate, error) { return nil, nil }
+
+func (DummyClaims) GetNotBefore() (*jwt.NumericDate, error) { return nil, nil }
+
+func (DummyClaims) GetIssuer() (string, error) { return "", nil }
+
+func (DummyClaims) GetSubject() (string, error) { return "", nil }
+
+func (DummyClaims) GetAudience() (jwt.ClaimStrings, error) { return nil, nil }
 
 func TestJwtService_GenerateToken(t *testing.T) {
 	tests := []struct {
@@ -166,4 +184,74 @@ func TestJwtService_ValidateToken_InvalidClaims(t *testing.T) {
 	jwtToken, err := service.ValidateToken(invalidToken)
 	assert.Error(t, err)
 	assert.Nil(t, jwtToken)
+}
+
+func TestJwtService_ValidateToken_MissingOrWrongTypeClaims(t *testing.T) {
+	secret := "test-secret"
+	expire := 3600
+	service := NewJwtService(secret, expire)
+
+	t.Run("missing userId claim", func(t *testing.T) {
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			// "userId" is missing
+			"exp": time.Now().Add(time.Duration(expire) * time.Second).Unix(),
+		})
+		tokenStr, err := token.SignedString([]byte(secret))
+		assert.NoError(t, err)
+		jwtToken, err := service.ValidateToken(tokenStr)
+		assert.Error(t, err)
+		assert.Nil(t, jwtToken)
+		assert.Contains(t, err.Error(), "userId")
+	})
+
+	t.Run("missing exp claim", func(t *testing.T) {
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"userId": "test-user-123",
+			// "exp" is missing
+		})
+		tokenStr, err := token.SignedString([]byte(secret))
+		assert.NoError(t, err)
+		jwtToken, err := service.ValidateToken(tokenStr)
+		assert.Error(t, err)
+		assert.Nil(t, jwtToken)
+		assert.Contains(t, err.Error(), "exp")
+	})
+
+	t.Run("userId is not a string", func(t *testing.T) {
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"userId": 12345, // int instead of string
+			"exp":    time.Now().Add(time.Duration(expire) * time.Second).Unix(),
+		})
+		tokenStr, err := token.SignedString([]byte(secret))
+		assert.NoError(t, err)
+		jwtToken, err := service.ValidateToken(tokenStr)
+		assert.Error(t, err)
+		assert.Nil(t, jwtToken)
+		assert.Contains(t, err.Error(), "userId")
+	})
+
+	t.Run("exp is not a float", func(t *testing.T) {
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"userId": "test-user-123",
+			"exp":    "not-a-float", // string instead of float
+		})
+		tokenStr, err := token.SignedString([]byte(secret))
+		assert.NoError(t, err)
+		jwtToken, err := service.ValidateToken(tokenStr)
+		assert.Error(t, err)
+		assert.Nil(t, jwtToken)
+		assert.Contains(t, err.Error(), "exp")
+	})
+}
+
+func TestJwtService_validateTokenFromParsedToken_InvalidClaimsType(t *testing.T) {
+	service := NewJwtService("test-secret", 3600)
+	// Create a jwt.Token with a claims type that is not jwt.MapClaims
+	token := &jwt.Token{
+		Claims: DummyClaims{}, // Not a MapClaims!
+	}
+	jwtToken, err := service.(*jwtService).validateTokenFromParsedToken(token)
+	assert.Error(t, err)
+	assert.Nil(t, jwtToken)
+	assert.Contains(t, err.Error(), "invalid token claims")
 }
