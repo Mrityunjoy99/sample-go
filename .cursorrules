@@ -1,9 +1,0 @@
-{
-  "commitMessage": {
-    "maxLength": 70,
-    "minLength": 50,
-    "pattern": "^[a-zA-Z0-9\\s\\-\\.,:;()]+$",
-    "patternDescription": "Commit message should only contain letters, numbers, spaces, and basic punctuation",
-    "description": "Commit messages should be precise and between 50-70 characters long"
-  }
-} 
