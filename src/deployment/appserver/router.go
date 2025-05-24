@@ -15,8 +15,14 @@ func RegisterRoutes(g *gin.Engine, s application.Service) {
 }
 
 func adminRouteGroup(g *gin.Engine, s application.Service) {
+	if s.AdminService == nil {
+		panic("AdminService is required for admin routes")
+	}
+
 	adminGroup := g.Group("/admin")
 	// admin.Use(middleware.AdminAuth())
+	// TODO: Implement and uncomment admin authentication middleware
+	// adminGroup.Use(middleware.AdminAuth())
 	adminController := admin.NewController(s.AdminService)
 	adminGroup.POST("/generate-token", adminController.GenerateToken)
 	adminGroup.POST("/validate-token", adminController.ValidateToken)

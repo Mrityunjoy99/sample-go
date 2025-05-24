@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Mrityunjoy99/sample-go/src/domain/entity"
@@ -35,8 +36,24 @@ func (s *jwtService) ValidateToken(token string) (*entity.JwtToken, error) {
 		return nil, err
 	}
 
+	// Safely extract claims
+	mapClaims, ok := claims.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, fmt.Errorf("invalid token claims")
+	}
+
+	userIdClaim, ok := mapClaims["userId"].(string)
+	if !ok {
+		return nil, fmt.Errorf("invalid userId claim")
+	}
+
+	expClaim, ok := mapClaims["exp"].(float64)
+	if !ok {
+		return nil, fmt.Errorf("invalid exp claim")
+	}
+
 	return &entity.JwtToken{
-		UserId:    claims.Claims.(jwt.MapClaims)["userId"].(string),
-		ExpiredAt: time.Unix(int64(claims.Claims.(jwt.MapClaims)["exp"].(float64)), 0),
+		UserId:    userIdClaim,
+		ExpiredAt: time.Unix(int64(expClaim), 0),
 	}, nil
 }

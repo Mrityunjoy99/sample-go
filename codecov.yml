@@ -7,16 +7,26 @@ comment:
   show_critical_paths: true
 coverage:
   precision: 2
-  range:
-  - 60.0
-  - 80.0
+  range: 80..100
   round: down
   status:
     changes: false
     default_rules:
       flag_coverage_not_uploaded_behavior: include
-    patch: true
-    project: true
+    patch:
+      default:
+        target: 80
+        threshold: 0
+        base: auto
+        only_pulls: false
+        if_ci_failed: error
+    project:
+      default:
+        target: 80
+        threshold: 0
+        base: auto
+        only_pulls: false
+        if_ci_failed: error
 github_checks:
   annotations: true
 ignore:

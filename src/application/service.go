@@ -13,6 +13,14 @@ type Service struct {
 }
 
 func NewService(r *repository.Repository, domainService *service.ServiceRegistry) *Service {
+	if domainService == nil {
+		panic("domainService is required")
+	}
+
+	if domainService.JwtService == nil {
+		panic("JwtService is required in domainService")
+	}
+	
 	userService := user.NewService(r.UserRepo)
 
 	return &Service{

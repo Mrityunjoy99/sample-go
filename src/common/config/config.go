@@ -26,7 +26,7 @@ type DatabaseConfig struct {
 }
 
 type JwtConfig struct {
-	Secret        string `default:"secret"`
+	Secret        string `default:""`
 	ExpireTimeSec int    `default:"3600"`
 }
 
