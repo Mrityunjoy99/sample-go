@@ -5,6 +5,7 @@ import "github.com/creasty/defaults"
 type Config struct {
 	App AppConfig
 	DB  DatabaseConfig
+	Jwt JwtConfig
 }
 
 type AppConfig struct {
@@ -22,6 +23,11 @@ type DatabaseConfig struct {
 	MaxOpenConnections int    `default:"5"`
 	ConnMaxIdleTimeSec int    `default:"10"`
 	ConnMaxLifeTimeSec int    `default:"600"`
+}
+
+type JwtConfig struct {
+	Secret        string `default:""`
+	ExpireTimeSec int    `default:"3600"`
 }
 
 var c *Config
