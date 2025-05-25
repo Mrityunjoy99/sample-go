@@ -5,22 +5,25 @@ import (
 	"github.com/Mrityunjoy99/sample-go/src/application/admin"
 	"github.com/Mrityunjoy99/sample-go/src/application/healthcheck"
 	"github.com/Mrityunjoy99/sample-go/src/application/user"
+	"github.com/Mrityunjoy99/sample-go/src/deployment/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(g *gin.Engine, s application.Service) {
-	registerHealthCheckRoutes(g)
-	registerUserRoutes(g, s)
-	adminRouteGroup(g, s)
+	globalGroup := g.Group("/")
+	globalGroup.Use(middleware.LoggerMiddleware())
+
+	registerHealthCheckRoutes(globalGroup)
+	registerUserRoutes(globalGroup, s)
+	adminRouteGroup(globalGroup, s)
 }
 
-func adminRouteGroup(g *gin.Engine, s application.Service) {
+func adminRouteGroup(g *gin.RouterGroup, s application.Service) {
 	if s.AdminService == nil {
 		panic("AdminService is required for admin routes")
 	}
 
 	adminGroup := g.Group("/admin")
-	// admin.Use(middleware.AdminAuth())
 	// TODO: Implement and uncomment admin authentication middleware
 	// adminGroup.Use(middleware.AdminAuth())
 	adminController := admin.NewController(s.AdminService)
@@ -28,12 +31,12 @@ func adminRouteGroup(g *gin.Engine, s application.Service) {
 	adminGroup.POST("/validate-token", adminController.ValidateToken)
 }
 
-func registerHealthCheckRoutes(g *gin.Engine) {
+func registerHealthCheckRoutes(g *gin.RouterGroup) {
 	healthCheckController := healthcheck.NewController()
 	g.GET("/health-check", healthCheckController.HealthCheck)
 }
 
-func registerUserRoutes(g *gin.Engine, s application.Service) {
+func registerUserRoutes(g *gin.RouterGroup, s application.Service) {
 	userController := user.NewController(s.UserService)
 	g.GET("/user/:id", userController.GetUserById)
 	g.POST("/user", userController.CreateUser)
