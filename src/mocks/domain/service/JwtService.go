@@ -4,6 +4,7 @@ package mock_domain_service
 
 import (
 	entity "github.com/Mrityunjoy99/sample-go/src/domain/entity"
+	genericerror "github.com/Mrityunjoy99/sample-go/src/tools/genericerror"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -14,7 +15,7 @@ type JwtService struct {
 }
 
 // GenerateToken provides a mock function with given fields: userId
-func (_m *JwtService) GenerateToken(userId string) (string, error) {
+func (_m *JwtService) GenerateToken(userId string) (string, genericerror.GenericError) {
 	ret := _m.Called(userId)
 
 	if len(ret) == 0 {
@@ -22,8 +23,8 @@ func (_m *JwtService) GenerateToken(userId string) (string, error) {
 	}
 
 	var r0 string
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (string, error)); ok {
+	var r1 genericerror.GenericError
+	if rf, ok := ret.Get(0).(func(string) (string, genericerror.GenericError)); ok {
 		return rf(userId)
 	}
 	if rf, ok := ret.Get(0).(func(string) string); ok {
@@ -32,17 +33,19 @@ func (_m *JwtService) GenerateToken(userId string) (string, error) {
 		r0 = ret.Get(0).(string)
 	}
 
-	if rf, ok := ret.Get(1).(func(string) error); ok {
+	if rf, ok := ret.Get(1).(func(string) genericerror.GenericError); ok {
 		r1 = rf(userId)
 	} else {
-		r1 = ret.Error(1)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(genericerror.GenericError)
+		}
 	}
 
 	return r0, r1
 }
 
 // ValidateToken provides a mock function with given fields: token
-func (_m *JwtService) ValidateToken(token string) (*entity.JwtToken, error) {
+func (_m *JwtService) ValidateToken(token string) (*entity.JwtToken, genericerror.GenericError) {
 	ret := _m.Called(token)
 
 	if len(ret) == 0 {
@@ -50,8 +53,8 @@ func (_m *JwtService) ValidateToken(token string) (*entity.JwtToken, error) {
 	}
 
 	var r0 *entity.JwtToken
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (*entity.JwtToken, error)); ok {
+	var r1 genericerror.GenericError
+	if rf, ok := ret.Get(0).(func(string) (*entity.JwtToken, genericerror.GenericError)); ok {
 		return rf(token)
 	}
 	if rf, ok := ret.Get(0).(func(string) *entity.JwtToken); ok {
@@ -62,10 +65,12 @@ func (_m *JwtService) ValidateToken(token string) (*entity.JwtToken, error) {
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string) error); ok {
+	if rf, ok := ret.Get(1).(func(string) genericerror.GenericError); ok {
 		r1 = rf(token)
 	} else {
-		r1 = ret.Error(1)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(genericerror.GenericError)
+		}
 	}
 
 	return r0, r1

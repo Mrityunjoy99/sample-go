@@ -3,6 +3,7 @@ package admin
 import (
 	"net/http"
 
+	"github.com/Mrityunjoy99/sample-go/src/common/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -49,7 +50,13 @@ func (c *controller) ValidateToken(ctx *gin.Context) {
 
 	respDto, err := c.service.ValidateToken(reqDto.Token)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		switch err.GetCode() {
+		case constant.ErrorCodeBadRequest:
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		default:
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+
 		return
 	}
 

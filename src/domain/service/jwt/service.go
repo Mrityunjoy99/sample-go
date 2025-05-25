@@ -1,10 +1,12 @@
 package jwt
 
 import (
-	"fmt"
+	"errors"
 	"time"
 
+	"github.com/Mrityunjoy99/sample-go/src/common/constant"
 	"github.com/Mrityunjoy99/sample-go/src/domain/entity"
+	"github.com/Mrityunjoy99/sample-go/src/tools/genericerror"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -13,7 +15,7 @@ type jwtService struct {
 	expireTimeSec int
 }
 
-func (s *jwtService) GenerateToken(userId string) (string, error) {
+func (s *jwtService) GenerateToken(userId string) (string, genericerror.GenericError) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userId": userId,
 		"exp":    time.Now().Add(time.Duration(s.expireTimeSec) * time.Second).Unix(),
@@ -21,38 +23,42 @@ func (s *jwtService) GenerateToken(userId string) (string, error) {
 
 	tokenString, err := token.SignedString([]byte(s.jwtSecret))
 	if err != nil {
-		return "", err
+		return "", genericerror.NewInternalErrByErr(err)
 	}
 
 	return tokenString, nil
 }
 
-func (s *jwtService) ValidateToken(token string) (*entity.JwtToken, error) {
+func (s *jwtService) ValidateToken(token string) (*entity.JwtToken, genericerror.GenericError) {
 	claims, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		return []byte(s.jwtSecret), nil
 	})
 
 	if err != nil {
-		return nil, err
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return nil, genericerror.NewGenericError(constant.ErrorCodeBadRequest, err.Error(), nil, err)
+		}
+
+		return nil, genericerror.NewInternalErrByErr(err)
 	}
 
 	return s.validateTokenFromParsedToken(claims)
 }
 
-func (s *jwtService) validateTokenFromParsedToken(claims *jwt.Token) (*entity.JwtToken, error) {
+func (s *jwtService) validateTokenFromParsedToken(claims *jwt.Token) (*entity.JwtToken, genericerror.GenericError) {
 	mapClaims, ok := claims.Claims.(jwt.MapClaims)
 	if !ok {
-		return nil, fmt.Errorf("invalid token claims")
+		return nil, genericerror.NewInternalErrByErr(errors.New("invalid token claims"))
 	}
 
 	userIdClaim, ok := mapClaims["userId"].(string)
 	if !ok {
-		return nil, fmt.Errorf("invalid userId claim")
+		return nil, genericerror.NewGenericError(constant.ErrorCodeBadRequest, "invalid userId claim", nil, errors.New("invalid userId claim"))
 	}
 
 	expClaim, ok := mapClaims["exp"].(float64)
 	if !ok {
-		return nil, fmt.Errorf("invalid exp claim")
+		return nil, genericerror.NewGenericError(constant.ErrorCodeBadRequest, "invalid exp claim", nil, errors.New("invalid exp claim"))
 	}
 
 	return &entity.JwtToken{
