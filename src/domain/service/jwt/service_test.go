@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Mrityunjoy99/sample-go/src/common/constant"
+	"github.com/Mrityunjoy99/sample-go/src/domain/entity"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 )
@@ -62,8 +64,14 @@ func TestJwtService_GenerateToken(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			service := NewJwtService(tt.jwtSecret, tt.expireTimeSec)
-			token, err := service.GenerateToken(tt.userId)
+			service := NewJwtService(tt.jwtSecret)
+			exp := time.Now().Add(time.Duration(tt.expireTimeSec) * time.Second)
+			jwtToken := &entity.JwtToken{
+				UserId:    tt.userId,
+				UserType:  constant.UserTypeUser,
+				ExpiredAt: exp,
+			}
+			token, err := service.GenerateToken(jwtToken)
 
 			if tt.expectedError {
 				assert.Error(t, err)
@@ -74,11 +82,11 @@ func TestJwtService_GenerateToken(t *testing.T) {
 
 				// Validate the generated token
 				if tt.validateResult {
-					jwtToken, err := service.ValidateToken(token)
+					parsed, err := service.ValidateToken(token)
 					assert.NoError(t, err)
-					assert.NotNil(t, jwtToken)
-					assert.Equal(t, tt.userId, jwtToken.UserId)
-					assert.True(t, jwtToken.ExpiredAt.After(time.Now()))
+					assert.NotNil(t, parsed)
+					assert.Equal(t, tt.userId, parsed.UserId)
+					assert.True(t, parsed.ExpiredAt.After(time.Now()))
 				}
 			}
 		})
@@ -125,20 +133,38 @@ func TestJwtService_ValidateToken(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			service := NewJwtService(tt.jwtSecret, tt.expireTimeSec)
+			service := NewJwtService(tt.jwtSecret)
 			var token string
 			var err error
 
 			switch tt.name {
 			case "Success - Validate valid token":
-				token, err = service.GenerateToken("test-user-123")
+				exp := time.Now().Add(time.Duration(tt.expireTimeSec) * time.Second)
+				jwtToken := &entity.JwtToken{
+					UserId:    "test-user-123",
+					UserType:  constant.UserTypeUser,
+					ExpiredAt: exp,
+				}
+				token, err = service.GenerateToken(jwtToken)
 				assert.NoError(t, err)
 			case "Failure - Token signed with different secret":
-				differentService := NewJwtService("different-secret", tt.expireTimeSec)
-				token, err = differentService.GenerateToken("test-user-123")
+				differentService := NewJwtService("different-secret")
+				exp := time.Now().Add(time.Duration(tt.expireTimeSec) * time.Second)
+				jwtToken := &entity.JwtToken{
+					UserId:    "test-user-123",
+					UserType:  constant.UserTypeUser,
+					ExpiredAt: exp,
+				}
+				token, err = differentService.GenerateToken(jwtToken)
 				assert.NoError(t, err)
 			case "Failure - Expired token":
-				token, err = service.GenerateToken("test-user-123")
+				exp := time.Now().Add(time.Duration(tt.expireTimeSec) * time.Second)
+				jwtToken := &entity.JwtToken{
+					UserId:    "test-user-123",
+					UserType:  constant.UserTypeUser,
+					ExpiredAt: exp,
+				}
+				token, err = service.GenerateToken(jwtToken)
 				assert.NoError(t, err)
 				time.Sleep(2 * time.Second) // Wait for token to expire
 			default:
@@ -161,97 +187,113 @@ func TestJwtService_ValidateToken(t *testing.T) {
 }
 
 func TestJwtService_ValidateToken_ExpiredToken(t *testing.T) {
-	service := NewJwtService("test-secret", 1)
-	token, err := service.GenerateToken("test-user-123")
+	service := NewJwtService("test-secret")
+	exp := time.Now().Add(1 * time.Second)
+	jwtToken := &entity.JwtToken{
+		UserId:    "test-user-123",
+		UserType:  constant.UserTypeUser,
+		ExpiredAt: exp,
+	}
+	token, err := service.GenerateToken(jwtToken)
 	assert.NoError(t, err)
 
 	// Wait for token to expire
 	time.Sleep(2 * time.Second)
 
-	jwtToken, err := service.ValidateToken(token)
+	parsed, err := service.ValidateToken(token)
 	assert.Error(t, err)
-	assert.Nil(t, jwtToken)
+	assert.Nil(t, parsed)
 }
 
 func TestJwtService_ValidateToken_InvalidClaims(t *testing.T) {
-	service := NewJwtService("test-secret", 3600)
-	token, err := service.GenerateToken("test-user-123")
+	service := NewJwtService("test-secret")
+	exp := time.Now().Add(3600 * time.Second)
+	jwtToken := &entity.JwtToken{
+		UserId:    "test-user-123",
+		UserType:  constant.UserTypeUser,
+		ExpiredAt: exp,
+	}
+	token, err := service.GenerateToken(jwtToken)
 	assert.NoError(t, err)
 
 	// Modify the token to make it invalid
 	invalidToken := token + "invalid"
 
-	jwtToken, err := service.ValidateToken(invalidToken)
+	parsed, err := service.ValidateToken(invalidToken)
 	assert.Error(t, err)
-	assert.Nil(t, jwtToken)
+	assert.Nil(t, parsed)
 }
 
 func TestJwtService_ValidateToken_MissingOrWrongTypeClaims(t *testing.T) {
 	secret := "test-secret"
 	expire := 3600
-	service := NewJwtService(secret, expire)
+	service := NewJwtService(secret)
 
 	t.Run("missing userId claim", func(t *testing.T) {
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			// "userId" is missing
-			"exp": time.Now().Add(time.Duration(expire) * time.Second).Unix(),
+			"exp":      time.Now().Add(time.Duration(expire) * time.Second).Unix(),
+			"userType": constant.UserTypeAdmin,
 		})
 		tokenStr, err := token.SignedString([]byte(secret))
 		assert.NoError(t, err)
-		jwtToken, err := service.ValidateToken(tokenStr)
+		parsed, err := service.ValidateToken(tokenStr)
 		assert.Error(t, err)
-		assert.Nil(t, jwtToken)
-		assert.Contains(t, err.Error(), "userId")
+		assert.Nil(t, parsed)
+		assert.Contains(t, err.Error(), "invalid", "claim")
 	})
 
 	t.Run("missing exp claim", func(t *testing.T) {
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"userId": "test-user-123",
+			"userId":   "test-user-123",
+			"userType": constant.UserTypeAdmin,
 			// "exp" is missing
 		})
 		tokenStr, err := token.SignedString([]byte(secret))
 		assert.NoError(t, err)
-		jwtToken, err := service.ValidateToken(tokenStr)
+		parsed, err := service.ValidateToken(tokenStr)
 		assert.Error(t, err)
-		assert.Nil(t, jwtToken)
+		assert.Nil(t, parsed)
 		assert.Contains(t, err.Error(), "exp")
 	})
 
 	t.Run("userId is not a string", func(t *testing.T) {
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"userId": 12345, // int instead of string
-			"exp":    time.Now().Add(time.Duration(expire) * time.Second).Unix(),
+			"userId":   12345, // int instead of string
+			"exp":      time.Now().Add(time.Duration(expire) * time.Second).Unix(),
+			"userType": constant.UserTypeAdmin,
 		})
 		tokenStr, err := token.SignedString([]byte(secret))
 		assert.NoError(t, err)
-		jwtToken, err := service.ValidateToken(tokenStr)
+		parsed, err := service.ValidateToken(tokenStr)
 		assert.Error(t, err)
-		assert.Nil(t, jwtToken)
+		assert.Nil(t, parsed)
 		assert.Contains(t, err.Error(), "userId")
 	})
 
 	t.Run("exp is not a float", func(t *testing.T) {
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"userId": "test-user-123",
-			"exp":    "not-a-float", // string instead of float
+			"userId":   "test-user-123",
+			"exp":      "not-a-float", // string instead of float
+			"userType": constant.UserTypeAdmin,
 		})
 		tokenStr, err := token.SignedString([]byte(secret))
 		assert.NoError(t, err)
-		jwtToken, err := service.ValidateToken(tokenStr)
+		parsed, err := service.ValidateToken(tokenStr)
 		assert.Error(t, err)
-		assert.Nil(t, jwtToken)
+		assert.Nil(t, parsed)
 		assert.Contains(t, err.Error(), "exp")
 	})
 }
 
 func TestJwtService_validateTokenFromParsedToken_InvalidClaimsType(t *testing.T) {
-	service := NewJwtService("test-secret", 3600)
+	service := NewJwtService("test-secret")
 	// Create a jwt.Token with a claims type that is not jwt.MapClaims
 	token := &jwt.Token{
 		Claims: DummyClaims{}, // Not a MapClaims!
 	}
-	jwtToken, err := service.(*jwtService).validateTokenFromParsedToken(token)
+	parsed, err := service.(*jwtService).validateTokenFromParsedToken(token)
 	assert.Error(t, err)
-	assert.Nil(t, jwtToken)
+	assert.Nil(t, parsed)
 	assert.Contains(t, err.Error(), "invalid token claims")
 }

@@ -2,6 +2,7 @@ package genericerror
 
 import "github.com/Mrityunjoy99/sample-go/src/common/constant"
 
+
 type ErrorDetails map[string]interface{}
 
 type GenericError interface {

@@ -3,9 +3,7 @@
 package mock_domain_service
 
 import (
-	constant "github.com/Mrityunjoy99/sample-go/src/common/constant"
 	entity "github.com/Mrityunjoy99/sample-go/src/domain/entity"
-
 	genericerror "github.com/Mrityunjoy99/sample-go/src/tools/genericerror"
 
 	mock "github.com/stretchr/testify/mock"
@@ -16,9 +14,9 @@ type JwtService struct {
 	mock.Mock
 }
 
-// GenerateToken provides a mock function with given fields: userId, userType
-func (_m *JwtService) GenerateToken(userId string, userType constant.UserType) (string, genericerror.GenericError) {
-	ret := _m.Called(userId, userType)
+// GenerateToken provides a mock function with given fields: _a0
+func (_m *JwtService) GenerateToken(_a0 *entity.JwtToken) (string, genericerror.GenericError) {
+	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GenerateToken")
@@ -26,17 +24,17 @@ func (_m *JwtService) GenerateToken(userId string, userType constant.UserType) (
 
 	var r0 string
 	var r1 genericerror.GenericError
-	if rf, ok := ret.Get(0).(func(string, constant.UserType) (string, genericerror.GenericError)); ok {
-		return rf(userId, userType)
+	if rf, ok := ret.Get(0).(func(*entity.JwtToken) (string, genericerror.GenericError)); ok {
+		return rf(_a0)
 	}
-	if rf, ok := ret.Get(0).(func(string, constant.UserType) string); ok {
-		r0 = rf(userId, userType)
+	if rf, ok := ret.Get(0).(func(*entity.JwtToken) string); ok {
+		r0 = rf(_a0)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
-	if rf, ok := ret.Get(1).(func(string, constant.UserType) genericerror.GenericError); ok {
-		r1 = rf(userId, userType)
+	if rf, ok := ret.Get(1).(func(*entity.JwtToken) genericerror.GenericError); ok {
+		r1 = rf(_a0)
 	} else {
 		if ret.Get(1) != nil {
 			r1 = ret.Get(1).(genericerror.GenericError)
