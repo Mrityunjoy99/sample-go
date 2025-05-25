@@ -28,7 +28,7 @@ func (c *controller) GenerateToken(ctx *gin.Context) {
 		return
 	}
 
-	token, err := c.service.GenerateToken(reqDto.UserId)
+	token, err := c.service.GenerateToken(reqDto.UserId, reqDto.UserType)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

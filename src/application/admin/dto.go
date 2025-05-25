@@ -1,7 +1,8 @@
 package admin
 
 type GenerateTokenReqDto struct {
-	UserId string `json:"user_id" binding:"required"`
+	UserId   string `json:"user_id" binding:"required"`
+	UserType string `json:"user_type" binding:"required"`
 }
 
 type GenerateTokenRespDto struct {

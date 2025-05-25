@@ -25,7 +25,7 @@ func Start() {
 	s := application.NewService(r, domainService)
 
 	g := gin.Default()
-	RegisterRoutes(g, *s)
+	RegisterRoutes(g, *s, *domainService)
 
 	err = g.Run()
 	if err != nil {
