@@ -11,15 +11,14 @@ import (
 )
 
 type jwtService struct {
-	jwtSecret     string
-	expireTimeSec int
+	jwtSecret string
 }
 
-func (s *jwtService) GenerateToken(userId string, userType constant.UserType) (string, genericerror.GenericError) {
+func (s *jwtService) GenerateToken(jwtToken *entity.JwtToken) (string, genericerror.GenericError) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userId":   userId,
-		"userType": userType,
-		"exp":      time.Now().Add(time.Duration(s.expireTimeSec) * time.Second).Unix(),
+		"userId":   jwtToken.UserId,
+		"userType": jwtToken.UserType,
+		"exp":      jwtToken.ExpiredAt.Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte(s.jwtSecret))

@@ -4,21 +4,22 @@ import (
 	"time"
 
 	"github.com/Mrityunjoy99/sample-go/src/common/constant"
+	"github.com/Mrityunjoy99/sample-go/src/domain/entity"
 	"github.com/Mrityunjoy99/sample-go/src/domain/service/jwt"
 	"github.com/Mrityunjoy99/sample-go/src/tools/genericerror"
 )
 
 type Service interface {
 	GenerateToken(userId string, userType string) (string, genericerror.GenericError)
-	ValidateToken(token string) (*ValidateTokenRespDto, genericerror.GenericError)
 }
 
 type service struct {
-	jwtService jwt.JwtService
+	jwtService    jwt.JwtService
+	expireTimeSec int
 }
 
-func NewService(jwtService jwt.JwtService) Service {
-	return &service{jwtService: jwtService}
+func NewService(jwtService jwt.JwtService, expireTimeSec int) Service {
+	return &service{jwtService: jwtService, expireTimeSec: expireTimeSec}
 }
 
 func (s *service) GenerateToken(userId string, userType string) (string, genericerror.GenericError) {
@@ -27,17 +28,11 @@ func (s *service) GenerateToken(userId string, userType string) (string, generic
 		return "", genericerror.NewGenericError(constant.ErrorCodeBadRequest, err.Error(), nil, err)
 	}
 
-	return s.jwtService.GenerateToken(userId, userTypeEnum)
-}
-
-func (s *service) ValidateToken(token string) (*ValidateTokenRespDto, genericerror.GenericError) {
-	jwtToken, err := s.jwtService.ValidateToken(token)
-	if err != nil {
-		return nil, err
+	jwtTokenEntity := &entity.JwtToken{
+		UserId:    userId,
+		UserType:  userTypeEnum,
+		ExpiredAt: time.Now().Add(time.Duration(s.expireTimeSec) * time.Second),
 	}
 
-	return &ValidateTokenRespDto{
-		UserId:    jwtToken.UserId,
-		ExpiredAt: jwtToken.ExpiredAt.Format(time.RFC850),
-	}, nil
+	return s.jwtService.GenerateToken(jwtTokenEntity)
 }

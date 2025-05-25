@@ -21,11 +21,18 @@ func Start() {
 	}
 
 	r := repository.NewRepository(db)
-	domainService := service.NewServiceRegistry(c)
-	s := application.NewService(r, domainService)
+	domainService, gerr := service.NewServiceRegistry(c)
+	if gerr != nil {
+		panic(gerr.Error())
+	}
+
+	appService, err := application.NewService(c, r, domainService)
+	if err != nil {
+		panic(err.Error())
+	}
 
 	g := gin.Default()
-	RegisterRoutes(g, *s, *domainService)
+	RegisterRoutes(g, *appService, *domainService)
 
 	err = g.Run()
 	if err != nil {

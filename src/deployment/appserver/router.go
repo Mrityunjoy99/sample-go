@@ -16,7 +16,7 @@ func RegisterRoutes(g *gin.Engine, appService application.Service, domainService
 	globalGroup.Use(middleware.LoggerMiddleware())
 
 	registerHealthCheckRoutes(globalGroup)
-	registerUserRoutes(globalGroup, appService)
+	registerUserRoutes(globalGroup, appService, domainService)
 	adminRouteGroup(globalGroup, appService, domainService)
 }
 
@@ -30,7 +30,6 @@ func adminRouteGroup(g *gin.RouterGroup, appService application.Service, domainS
 	// adminGroup.Use(middleware.AdminAuth())
 	adminController := admin.NewController(appService.AdminService)
 	adminGroup.POST("/generate-token", middleware.AuthMiddleware(domainService.JwtService, constant.UserTypeAdmin), adminController.GenerateToken)
-	adminGroup.POST("/validate-token", middleware.AuthMiddleware(domainService.JwtService, constant.UserTypeUser), adminController.ValidateToken)
 }
 
 func registerHealthCheckRoutes(g *gin.RouterGroup) {
@@ -38,10 +37,10 @@ func registerHealthCheckRoutes(g *gin.RouterGroup) {
 	g.GET("/health-check", healthCheckController.HealthCheck)
 }
 
-func registerUserRoutes(g *gin.RouterGroup, appService application.Service) {
+func registerUserRoutes(g *gin.RouterGroup, appService application.Service, domainService service.ServiceRegistry) {
 	userController := user.NewController(appService.UserService)
-	g.GET("/user/:id", userController.GetUserById)
-	g.POST("/user", userController.CreateUser)
-	g.PUT("/user/:id", userController.UpdateUser)
-	g.DELETE("/user/:id", userController.DeleteUser)
+	g.GET("/user/:id", middleware.AuthMiddleware(domainService.JwtService, constant.UserTypeUser), userController.GetUserById)
+	g.POST("/user", middleware.AuthMiddleware(domainService.JwtService, constant.UserTypeUser), userController.CreateUser)
+	g.PUT("/user/:id", middleware.AuthMiddleware(domainService.JwtService, constant.UserTypeUser), userController.UpdateUser)
+	g.DELETE("/user/:id", middleware.AuthMiddleware(domainService.JwtService, constant.UserTypeManager), userController.DeleteUser)
 }
