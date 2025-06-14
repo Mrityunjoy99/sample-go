@@ -26,6 +26,9 @@ run:
 generate:
 	go generate $(VERB) ./...
 
+generate-admin-token:
+	go run script/generateToken.go
+
 test-run:
 	GIN_MODE=release go test -race $(VERB) $(MOD)
 
