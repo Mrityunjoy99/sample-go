@@ -17,7 +17,6 @@ bin/*
 vendor/
 script/*
 
-.env
 tmp/*
 
 # VS code build
@@ -33,9 +32,6 @@ rest-app-binary
 # Created by https://www.toptal.com/developers/gitignore/api/go,vim,goland,visualstudiocode,dotenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=go,vim,goland,visualstudiocode,dotenv
 
-### dotenv ###
-.env*
-!.env.description
 
 ### Go ###
 # If you prefer the allow list template instead of the deny list, see community template:
@@ -182,6 +178,7 @@ tags
 # Ignore all local history of files
 .history
 .ionide
+.env
 
 # Support for Project snippet scope
 
